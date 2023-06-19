@@ -1,5 +1,5 @@
 //const http = require("http");
-const mysql2 = require("mysql2");
+const mysql2 = require("mysql");
 const hostname = "127.0.0.1";
 const port = 3001;
 const bodyParser = require("body-parser");
@@ -11,7 +11,7 @@ app.use(cors());
 const connection = mysql2.createConnection({
   host: "localhost",
   user: "root",
-  password: "1234",
+  password: "0548574423",
   database: "fullstack6",
 });
 
@@ -105,7 +105,7 @@ app.put("/users/:username", (req, res) => {
 });
 
 app.get("/users/:username", (req, res) => {
-  //console.log("in users/id");
+  console.log("in users/id");
   const { username } = req.params;
   const query = "select * from users where username=?";
   let ansForQuery;

@@ -31,7 +31,7 @@ export default function Login() {
     console.log(inputs);
     let userName = inputs.username;
     let password = inputs.password;
-    console.log(userName);
+    console.log(password);
     //let id = 12; ///???? change username to be unique
     fetch(`http://127.0.0.1:3001/users/${userName}`)
       .then(
