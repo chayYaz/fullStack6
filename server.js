@@ -324,3 +324,21 @@ app.post("/users/posts/:postId/comments", (req, res) => {
     res.send(results);
   });
 });
+
+
+
+app.delete("/users/:userId/posts/:postId/comments/:commentId", (req, res) => {
+  const { commentId, postId } = req.params;
+  //const bodyReq = req.body;
+  const query =
+    "delete from comments where postId=? and id=?;";
+  connection.query(
+    query,
+    [postId, commentId],
+    (err, results) => {
+      if (err) throw err;
+      console.log(results);
+      res.send({body:"deleted comment successfully"});
+    }
+  );
+});
