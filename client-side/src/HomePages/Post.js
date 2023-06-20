@@ -7,6 +7,10 @@ function Post(props) {
 const urlPrefix = "http://localhost:3001/";
     const [displayComments, setDisplayComments] = useState('none');
     const [comments, setComments] = useState(null);
+    const [mail, setMail] = useState("");
+    const [body, setBody] = useState("");
+    const [updateBody, setUpdateBody] = useState("");
+    const [name, setName] = useState("");
     const userId = JSON.parse(localStorage["currentUser"]).id;
     const getComments = async () => {
         console.log("in get comments");
@@ -33,9 +37,9 @@ const urlPrefix = "http://localhost:3001/";
         }
     }
     const addComment=()=>{
-        var emailVal = document.getElementById("emailNewComment").value;
-        var nameVal = document.getElementById("nameNewComment").value;
-        var bodyVal = document.getElementById("bodyNewComment").value;
+        var emailVal = mail;
+        var nameVal =name;
+        var bodyVal = body;
         fetch(`${urlPrefix}users/posts/${props.postId}/comments`, {
             method: "post",
             headers: {
@@ -49,8 +53,6 @@ const urlPrefix = "http://localhost:3001/";
           })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
-                console.log(comments);
               setComments((prevList) => [...prevList, 
                 {
                     postId:props.postId,
@@ -59,6 +61,9 @@ const urlPrefix = "http://localhost:3001/";
                     name:nameVal,
                     email:emailVal
                   }]);
+                  setMail("");
+                  setName("");
+                  setBody("");
                   console.log(comments);
             })
             .catch((error) => {
@@ -87,14 +92,23 @@ const urlPrefix = "http://localhost:3001/";
               .catch((error) => {
                 console.error("Error coud not delete:", error);
               });
-          
+ 
     }
+
+   
+
+   
     return (
         <div className={'post' + (props.selected ? ' selected': '')}>
             <h2><Link className="h2" onClick={props.onClick}>{props.title}</Link></h2>
             <p>{props.body}</p>
             <div className="comments" style={{display: !props.selected && 'none'}}>
-                <Link onClick={toggleComments}>Comments</Link>
+            <button onClick={() => props.updatePost(updateBody, props.postId)} >
+              Update Post 
+              </button>
+
+              <textarea value={updateBody} onChange={(e) => setUpdateBody(e.target.value)} required></textarea> 
+                <Link onClick={toggleComments}>Comments</Link><br />
                 <div style={{display: displayComments}}>
                     {
                     !comments ? 'Loading...' :
@@ -105,20 +119,14 @@ const urlPrefix = "http://localhost:3001/";
                                 name={comment.name}
                                 email={comment.email}
                                 body={comment.body}
-                                handleChangeDeleteComment={handleChangeDeleteComment}
-                            />)
+                                handleChangeDeleteComment={handleChangeDeleteComment}/>)
                     }
                 </div>
                 <div>
-                <form>
-                    
-                    <label><input type="text" id="emailNewComment" name="email" required />
-                    </label><br />
-                    <label><input type="text" id="nameNewComment" name="name" required />
-                    </label><br />
-                    <label>
-                    <textarea id="bodyNewComment" name="body" rows="4" cols="50" required></textarea>
-                    </label><br />
+                <form>   
+                    <label> Mail:<input type="text" value={mail} onChange={(e) => setMail(e.target.value)} required /></label><br />
+                    <label> Name:<input type="text" value={name} onChange={(e) => setName(e.target.value)} required /></label><br />
+                    <label> Body:<textarea value={body} onChange={(e) => setBody(e.target.value)} rows="4" cols="50" required></textarea> </label><br />
                     <input type="button" value="add comment" onClick={addComment}/>
                 </form>
                     

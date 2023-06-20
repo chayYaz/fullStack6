@@ -1,5 +1,5 @@
 //const http = require("http");
-const mysql2 = require("mysql");
+const mysql2 = require("mysql2");
 const hostname = "127.0.0.1";
 const port = 3001;
 const bodyParser = require("body-parser");
@@ -13,6 +13,8 @@ const connection = mysql2.createConnection({
   user: "root",
   password: "0548574423",
   database: "fullstack6",
+  port:'3006'
+  //socketPath: 'C:\Users\reuto\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\MySQL'
 });
 
 app.listen(port, hostname, () => {
@@ -26,27 +28,6 @@ app.get("/login", (req, res) => {
   console.log("Login route accessed");
   res.send("Login page");
 });
-
-// app.get("/comments/1", (req, res) => {
-//   console.log("in comments/1");
-//   const query = "select * from comments where id=1";
-//   let ansForQuery;
-//   connection.query(query, (err, results) => {
-//     if (err) throw err;
-//     ansForQuery = results;
-//     console.log(ansForQuery);
-//   });
-//   res.send(ansForQuery);
-// });
-// app.post("/users", (req, res) => {
-//   console.log("in post to comments. adding user");
-//   const query =
-//     "INSERT INTO users (username, password,email) VALUES ('chaya', '2021','algebralin@gmail.com');  ";
-//   connection.query(query, (err, results) => {
-//     if (err) throw err;
-//     console.log(results);
-//   });
-// });
 
 app.post("/users", (req, res) => {
   const body = req.body;
@@ -188,22 +169,22 @@ app.get("/users/:userId/todos", (req, res) => {
   });
 });
 
-app.put("/comments/:id", (req, res) => {
-  const { id } = req.params;
-  const bodyReq = req.body;
-  const body = bodyReq.body;
-  const email = bodyReq.email;
-  const postId = bodyReq.postId;
-  const name = bodyReq.name;
-  console.log(req); //email, password, username);
-  const query =
-    "UPDATE comments SET postId=?, email=?, name=?, body=? WHERE id=?;";
-  connection.query(query, [postId, email, name, body, id], (err, results) => {
-    if (err) throw err;
-    console.log(results);
-    res.send("put comment successfully");
-  });
-});
+// app.put("/comments/:id", (req, res) => {
+//   const { id } = req.params;
+//   const bodyReq = req.body;
+//   const body = bodyReq.body;
+//   const email = bodyReq.email;
+//   const postId = bodyReq.postId;
+//   const name = bodyReq.name;
+//   console.log(req); //email, password, username);
+//   const query =
+//     "UPDATE comments SET postId=?, email=?, name=?, body=? WHERE id=?;";
+//   connection.query(query, [postId, email, name, body, id], (err, results) => {
+//     if (err) throw err;
+//     console.log(results);
+//     res.send("put comment successfully");
+//   });
+// });
 app.put("/users/:userId/todos/:todoId", (req, res) => {
   const { userId, todoId } = req.params;
   const bodyReq = req.body;
@@ -282,10 +263,58 @@ app.get("/users/:userId/posts", (req, res) => {
   });
 });
 
+app.delete("/users/posts/:postId", (req, res) => {
+  const {  postId } = req.params;
+  //const bodyReq = req.body;
+  console.log('in delete all comments');
+  const query ="delete from posts where id=? ;";
+  connection.query(query,[postId],(err, results) => {
+      if (err) throw err;
+      console.log(results);
+      res.send({body:"deleted all comments successfully"});
+    }
+  );
+});
 
+app.post("/users/:userId/posts", (req, res) => {
+  const { userId } = req.params;
+  const bodyReq = req.body;
+const title = bodyReq.title;
+const body = bodyReq.body;
+  const query ="  INSERT INTO posts (userId,title,body) VALUES (?,?,?);"; 
+  connection.query(query,[userId,title, body],(err, results) => {
+      if (err) throw err;
+      console.log(results);
+      const postId = results.insertId;
+      const createdPost = { id: postId, userId, title, body }; 
+      res.send(createdPost);
+
+    }
+  );
+});
+
+app.put("/users/posts/:postId", (req, res) => {
+  const { postId} = req.params;
+  const bodyReq = req.body;
+  const body = bodyReq.bodyPost;
+  console.log(body);
+  const query ="UPDATE  posts set body=? where id=?;"; 
+  connection.query(query,[body, postId],(err, results) => {
+      if (err) throw err;
+      else
+      console.log(results);
+     
+      //const postId = results.insertId;
+      //const createdPost = { id: postId, userId, title, body }; 
+      res.send(results);
+
+    }
+  );
+});
+//${urlPrefix}users/posts/${postId}
 app.get("/users/posts/:postId/comments", (req, res) => {
   const { postId } = req.params;
- 
+  console.log('in get all comments');
   const query = "select * from comments where postid=?";
   let ansForQuery;
   connection.query(query, [postId], (err, results) => {
@@ -297,22 +326,18 @@ app.get("/users/posts/:postId/comments", (req, res) => {
 });
 
 
-// app.post("/users/posts/:postId/comments", (req, res) => {
-//   const { postId } = req.params;
-//   const bodyReq = req.body;
-// const name = bodyReq.name;
-// const bodyComment=bodyReq.body;
-// console.log(bodyComment);
-// const email=bodyReq.email;
-//   const query = "insert into comments (postid,name,email,body) values(?,?,?,?)";
-//   let ansForQuery;
-//   connection.query(query, [postId,name,email,bodyComment], (err, results) => {
-//     if (err) throw err;
-//     ansForQuery = results;
-//     console.log(ansForQuery);
-//     res.send(ansForQuery);
-//   });
-// });
+app.delete("/users/posts/:postId/comments", (req, res) => {
+  const {  postId } = req.params;
+  console.log('in delete all comments');
+  const query ="delete from comments where postId=? ;";
+  connection.query(query,[postId],(err, results) => {
+      if (err) throw err;
+      console.log(results);
+      res.send({body:"deleted all comments successfully"});
+    }
+  );
+});
+
 app.post("/users/posts/:postId/comments", (req, res) => {
   const { postId } = req.params;
   const { name, email, body } = req.body;
@@ -329,7 +354,6 @@ app.post("/users/posts/:postId/comments", (req, res) => {
 
 app.delete("/users/:userId/posts/:postId/comments/:commentId", (req, res) => {
   const { commentId, postId } = req.params;
-  //const bodyReq = req.body;
   const query =
     "delete from comments where postId=? and id=?;";
   connection.query(
