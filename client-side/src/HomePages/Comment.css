@@ -1,0 +1,22 @@
+.comment {
+  background-color: #f5f5f5;
+  padding: 10px;
+  margin:10px;
+  margin-bottom: 10px;
+}
+
+.comment h3 {
+  margin-top: 0;
+}
+
+.comment p {
+  margin-bottom: 5px;
+}
+
+.comment input[type="button"] {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
